@@ -1,0 +1,300 @@
+                 -1   $MODDE0CV 
+0000              1   ;  MODDDE2: Register definition for DE2-8052 softcore
+0000              2   ;
+0000              3   ;   Copyright (C) 2011  Jesus Calvino-Fraga, jesusc at ece.ubc.ca
+0000              4   ;
+0000              5   ;   This library is free software; you can redistribute it and/or
+0000              6   ;   modify it under the terms of the GNU Lesser General Public
+0000              7   ;   License as published by the Free Software Foundation; either
+0000              8   ;   version 2.1 of the License, or (at your option) any later version.
+0000              9   ;
+0000             10   ;   This library is distributed in the hope that it will be useful,
+0000             11   ;   but WITHOUT ANY WARRANTY; without even the implied warranty of
+0000             12   ;   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+0000             13   ;   Lesser General Public License for more details.
+0000             14   ;
+0000             15   ;   You should have received a copy of the GNU Lesser General Public
+0000             16   ;   License along with this library; if not, write to the Free Software
+0000             17   ;   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+0000             18   ;
+0000             19       
+0000             20   P0     DATA  080H  ;PORT 0
+0000             21   SP     DATA  081H  ;STACK POINTER
+0000             22   DPL    DATA  082H  ;DATA POINTER 0 - LOW BYTE
+0000             23   DPH    DATA  083H  ;DATA POINTER 0 - HIGH BYTE
+0000             24   DPL1   DATA  084H  ;DATA POINTER 1 - LOW BYTE
+0000             25   DPH1   DATA  085H  ;DATA POINTER 1 - HIGH BYTE
+0000             26   DPS    DATA  086H  ;DATA POINTER SELECT. DPH1, DPL1 active when DPS.0=1
+0000             27   PCON   DATA  087H  ;POWER CONTROL
+0000             28   TCON   DATA  088H  ;TIMER CONTROL
+0000             29   TMOD   DATA  089H  ;TIMER MODE
+0000             30   TL0    DATA  08AH  ;TIMER 0 - LOW BYTE
+0000             31   TL1    DATA  08BH  ;TIMER 1 - LOW BYTE
+0000             32   TH0    DATA  08CH  ;TIMER 0 - HIGH BYTE
+0000             33   TH1    DATA  08DH  ;TIMER 1 - HIGH BYTE
+0000             34   P1     DATA  090H  ;PORT 1
+0000             35   SCON   DATA  098H  ;SERIAL PORT CONTROL
+0000             36   SBUF   DATA  099H  ;SERIAL PORT BUFFER
+0000             37   P2     DATA  0A0H  ;PORT 2
+0000             38   IE     DATA  0A8H  ;INTERRUPT ENABLE
+0000             39   P3     DATA  0B0H  ;PORT 3
+0000             40   IP     DATA  0B8H  ;INTERRUPT PRIORITY
+0000             41   T2CON  DATA  0C8H  ;TIMER 2 CONTROL
+0000             42   T2MOD  DATA  0C9H  ;TIMER 2 MODE
+0000             43   RCAP2L DATA  0CAH  ;TIMER 2 CAPTURE REGISTER - LOW BYTE
+0000             44   RCAP2H DATA  0CBH  ;TIMER 2 CAPTURE REGISTER - HIGH BYTE
+0000             45   TL2    DATA  0CCH  ;TIMER 2 - LOW BYTE
+0000             46   TH2    DATA  0CDH  ;TIMER 2 - HIGH BYTE
+0000             47   PSW    DATA  0D0H  ;PROGRAM STATUS WORD
+0000             48   ACC    DATA  0E0H  ;ACCUMULATOR
+0000             49   B      DATA  0F0H  ;MULTIPLICATION REGISTER
+0000             50   IT0    BIT   088H  ;TCON.0 - EXT. INTERRUPT 0 TYPE
+0000             51   IE0    BIT   089H  ;TCON.1 - EXT. INTERRUPT 0 EDGE FLAG
+0000             52   IT1    BIT   08AH  ;TCON.2 - EXT. INTERRUPT 1 TYPE
+0000             53   IE1    BIT   08BH  ;TCON.3 - EXT. INTERRUPT 1 EDGE FLAG
+0000             54   TR0    BIT   08CH  ;TCON.4 - TIMER 0 ON/OFF CONTROL
+0000             55   TF0    BIT   08DH  ;TCON.5 - TIMER 0 OVERFLOW FLAG
+0000             56   TR1    BIT   08EH  ;TCON.6 - TIMER 1 ON/OFF CONTROL
+0000             57   TF1    BIT   08FH  ;TCON.7 - TIMER 1 OVERFLOW FLAG
+0000             58   RI     BIT   098H  ;SCON.0 - RECEIVE INTERRUPT FLAG
+0000             59   TI     BIT   099H  ;SCON.1 - TRANSMIT INTERRUPT FLAG
+0000             60   RB8    BIT   09AH  ;SCON.2 - RECEIVE BIT 8
+0000             61   TB8    BIT   09BH  ;SCON.3 - TRANSMIT BIT 8
+0000             62   REN    BIT   09CH  ;SCON.4 - RECEIVE ENABLE
+0000             63   SM2    BIT   09DH  ;SCON.5 - SERIAL MODE CONTROL BIT 2
+0000             64   SM1    BIT   09EH  ;SCON.6 - SERIAL MODE CONTROL BIT 1
+0000             65   SM0    BIT   09FH  ;SCON.7 - SERIAL MODE CONTROL BIT 0
+0000             66   EX0    BIT   0A8H  ;IE.0 - EXTERNAL INTERRUPT 0 ENABLE
+0000             67   ET0    BIT   0A9H  ;IE.1 - TIMER 0 INTERRUPT ENABLE
+0000             68   EX1    BIT   0AAH  ;IE.2 - EXTERNAL INTERRUPT 1 ENABLE
+0000             69   ET1    BIT   0ABH  ;IE.3 - TIMER 1 INTERRUPT ENABLE
+0000             70   ES     BIT   0ACH  ;IE.4 - SERIAL PORT INTERRUPT ENABLE
+0000             71   ET2    BIT   0ADH  ;IE.5 - TIMER 2 INTERRUPT ENABLE
+0000             72   EA     BIT   0AFH  ;IE.7 - GLOBAL INTERRUPT ENABLE
+0000             73   RXD    BIT   0B0H  ;P3.0 - SERIAL PORT RECEIVE INPUT
+0000             74   TXD    BIT   0B1H  ;P3.1 - SERIAL PORT TRANSMIT OUTPUT
+0000             75   INT0   BIT   0B2H  ;P3.2 - EXTERNAL INTERRUPT 0 INPUT
+0000             76   INT1   BIT   0B3H  ;P3.3 - EXTERNAL INTERRUPT 1 INPUT
+0000             77   T0     BIT   0B4H  ;P3.4 - TIMER 0 COUNT INPUT
+0000             78   T1     BIT   0B5H  ;P3.5 - TIMER 1 COUNT INPUT
+0000             79   WR     BIT   0B6H  ;P3.6 - WRITE CONTROL FOR EXT. MEMORY
+0000             80   RD     BIT   0B7H  ;P3.7 - READ CONTROL FOR EXT. MEMORY
+0000             81   PX0    BIT   0B8H  ;IP.0 - EXTERNAL INTERRUPT 0 PRIORITY
+0000             82   PT0    BIT   0B9H  ;IP.1 - TIMER 0 PRIORITY
+0000             83   PX1    BIT   0BAH  ;IP.2 - EXTERNAL INTERRUPT 1 PRIORITY
+0000             84   PT1    BIT   0BBH  ;IP.3 - TIMER 1 PRIORITY
+0000             85   PS     BIT   0BCH  ;IP.4 - SERIAL PORT PRIORITY
+0000             86   PT2    BIT   0BDH  ;IP.5 - TIMER 2 PRIORITY
+0000             87   CAP2   BIT   0C8H  ;T2CON.0 - CAPTURE OR RELOAD SELECT
+0000             88   CNT2   BIT   0C9H  ;T2CON.1 - TIMER OR COUNTER SELECT
+0000             89   TR2    BIT   0CAH  ;T2CON.2 - TIMER 2 ON/OFF CONTROL
+0000             90   EXEN2  BIT   0CBH  ;T2CON.3 - TIMER 2 EXTERNAL ENABLE FLAG
+0000             91   TCLK   BIT   0CCH  ;T2CON.4 - TRANSMIT CLOCK SELECT
+0000             92   RCLK   BIT   0CDH  ;T2CON.5 - RECEIVE CLOCK SELECTT
+0000             93   EXF2   BIT   0CEH  ;T2CON.6 - EXTERNAL TRANSITION FLAG
+0000             94   TF2    BIT   0CFH  ;T2CON.7 - TIMER 2 OVERFLOW FLAG
+0000             95   P      BIT   0D0H  ;PSW.0 - ACCUMULATOR PARITY FLAG
+0000             96   OV     BIT   0D2H  ;PSW.2 - OVERFLOW FLAG
+0000             97   RS0    BIT   0D3H  ;PSW.3 - REGISTER BANK SELECT 0
+0000             98   RS1    BIT   0D4H  ;PSW.4 - REGISTER BANK SELECT 1
+0000             99   F0     BIT   0D5H  ;PSW.5 - FLAG 0
+0000            100   AC     BIT   0D6H  ;PSW.6 - AUXILIARY CARRY FLAG
+0000            101   CY     BIT   0D7H  ;PSW.7 - CARRY FLAG
+0000            102   
+0000            103   ; For the altera DE2 configured with an 8051/8052 softcore processor
+0000            104   ; we have the following extra registers:
+0000            105   
+0000            106   HEX0   DATA  091H ; Zero turns the segment on
+0000            107   HEX1   DATA  092H ; 
+0000            108   HEX2   DATA  093H ; 
+0000            109   HEX3   DATA  094H ; 
+0000            110   HEX4   DATA  08EH ;
+0000            111   HEX5   DATA  08FH ;
+0000            112   HEX6   DATA  096H ;
+0000            113   HEX7   DATA  097H ;
+0000            114   
+0000            115   P0MOD  DATA  09AH ; Input/output mode bits for port 0.  '1' sets the port to output mode.
+0000            116   P1MOD  DATA  09BH ; Input/output mode bits for port 1
+0000            117   P2MOD  DATA  09CH ; Input/output mode bits for port 2
+0000            118   P3MOD  DATA  09DH ; Input/output mode bits for port 3
+0000            119   
+0000            120   LEDRA  DATA  0E8H ; LEDs LEDR0 to LEDR7 (bit addressable, ex: LEDRA.1 for LEDR1)
+0000            121   LEDRB  DATA  095H ; LEDs LEDR8 to LEDR15
+0000            122   LEDRC  DATA  09EH ; LEDs LEDR16, LEDR15, and LEDG8
+0000            123   LEDG   DATA  0F8H ; LEDs LEDG0 to LEDG7 (bit addressable, ex: LEDG.3 for LEDG3)
+0000            124   SWA    DATA  0E8H ; Switches SW0 to SW7 (bit addressable, ex: SWA.1 for SW1)
+0000            125   SWB    DATA  095H ; Switches SW8 to SW15
+0000            126   SWC    DATA  09EH ; Switches SW16 and SW17
+0000            127   KEY    DATA  0F8H ; KEY1=KEY.1, KEY2=KEY.2, KEY3=KEY.3.  KEY0 is the reset button! 
+0000            128   
+0000            129   LCD_CMD   DATA 0D8H ;
+0000            130   LCD_DATA  DATA 0D9H ;
+0000            131   LCD_MOD   DATA 0DAH ; Write 0xff to make LCD_DATA an output
+0000            132   LCD_RW    BIT  0D8H ; '0' writes to LCD
+0000            133   LCD_EN    BIT  0D9H ; Toggle from '1' to '0'
+0000            134   LCD_RS    BIT  0DAH ; '0' for commands, '1' for data
+0000            135   LCD_ON    BIT  0DBH ; Write '1' to power the LCD
+0000            136   LCD_BLON  BIT  0DCH ; Write '1' to turn on back light
+0000            137   
+0000            138   FLASH_CMD  data 0DBH ; The control bits of the flash memory:
+0000            139   ; bit 0: FL_RST_N  Set to 1 for normal operation
+0000            140   ; bit 1: FL_WE_N
+0000            141   ; bit 2: FL_OE_N
+0000            142   ; bit 3: FL_CE_N
+0000            143   FLASH_DATA data 0DCH ; 8-bit data bus of flash memory.
+0000            144   FLASH_MOD  data 0DDH ; 0xff makes FLASH_DATA output.  0x00 makes FLASH_DATA input.
+0000            145   FLASH_ADD0 data 0E1H ; address bits 0 to 7.
+0000            146   FLASH_ADD1 data 0E2H ; address bits 8 to 15.
+0000            147   FLASH_ADD2 data 0E3H ; address bits 16 to 21.
+0000            148   
+0000              2   
+0000              3   org 0000H
+0000 020227       4       ljmp init
+0003              5   
+0003              6   XTAL equ 33333333 ; variables to calcualte timing reload
+0003              7   FREQ equ 100
+0003              8   RELOAD_TIMER_10ms equ 65536 - (XTAL/(12*FREQ))
+0003              9   
+0030             10   dseg at 30h
+0030             11   time:   ds 3 ; 3 bytes, one for seconds, minutes and hours, stored in BCD
+0033             12   date:   ds 3 ; 3 bytes, one for day, month and year, stored in BCD   
+0036             13   
+0000             14   bseg
+0000             15   blank: dbit 1 ; blank flag
+0001             16   twelve: dbit 1 ; 12 hour flag
+0002             17   disp_sec: dbit 1 ; display seconds flag
+0003             18   flash_flag: dbit 1 ; flash flag
+0004             19   inc_dec_flag: dbit 1 ; increment/decrement flag
+0005             20   
+                 -1   $include(clock_display.asm)
+00E3             86   $LIST
+                 -1   $include(clock_set.asm)
+01E1             91   $LIST
+01E1             23   
+01E1             24   cseg
+01E1             25   myLUT: ; Look-up table for 7-seg displays
+01E1 C0F9A4B0    26       DB 0C0H, 0F9H, 0A4H, 0B0H, 099H        ; 0 TO 4
+     99
+01E6 9282F880    27       DB 092H, 082H, 0F8H, 080H, 090H        ; 4 TO 9
+     90
+01EB             28   
+01EB             29   wait10ms:
+01EB C28C        30       clr TR0
+01ED 758C93      31       mov TH0, #high(RELOAD_TIMER_10ms)
+01F0 758A7F      32       mov TL0, #low(RELOAD_TIMER_10ms)
+01F3 C28D        33       clr TF0
+01F5 D28C        34       setb TR0
+01F7             35   wait10ms_L0:
+01F7 308DFD      36       jnb TF0, wait10ms_L0
+01FA 22          37       ret
+01FB             38   
+01FB             39   incTime:
+01FB E530        40       mov a, time+0
+01FD 2401        41       add a, #1
+01FF D4          42       da a
+0200 B4601B      43       cjne a, #60H, incTime_ret1 ; compare to 60 in BCD
+0203 E4          44       clr a
+0204 F530        45       mov time+0, a
+0206 E531        46       mov a, time+1
+0208 2401        47       add a, #1
+020A D4          48       da a
+020B B46013      49       cjne a, #60H, incTime_ret2 ; compare to 60 in BCD
+020E E4          50       clr a
+020F F531        51       mov time+1, a
+0211 E532        52       mov a, time+2
+0213 2401        53       add a, #1
+0215 D4          54       da a
+0216 B4240B      55       cjne a, #24H, incTime_ret3 ; compare to 24 in BCD
+0219 7400        56       mov a, #0
+021B F532        57       mov time+2, a
+021D 22          58       ret
+021E             59   incTime_ret1:  
+021E F530        60       mov time+0, a
+0220 22          61       ret
+0221             62   incTime_ret2:
+0221 F531        63       mov time+1, a
+0223 22          64       ret
+0224             65   incTime_ret3:
+0224 F532        66       mov time+2, a
+0226 22          67       ret
+0227             68   
+0227             69   init:
+0227 75817F      70       mov sp, #07FH ; set stack pointer
+022A 758901      71       mov TMOD, #00000001B ; set timer 0 mode 1
+022D E4          72       clr a
+022E F5E8        73            mov LEDRA, a ; clear LEDs
+0230 F595        74            mov LEDRB, a
+0232 F8          75       mov R0, a ; register 0 used to count 10ms delays
+0233 F9          76       mov R1, a ; register 1 bits used for <fill in later>
+0234 F530        77       mov time+0, a ; clear the time variable
+0236 F531        78       mov time+1, a
+0238 F532        79       mov time+2, a
+023A F533        80       mov date+0, a
+023C F534        81       mov date+1, a
+023E F535        82       mov date+2, a
+0240 C200        83       clr blank
+0242 C201        84       clr twelve
+0244 C202        85       clr disp_sec
+0246 8000        86       sjmp main
+0248             87   
+0248             88   main:
+0248 1201EB      89       lcall wait10ms
+024B             90   check_set:
+024B 20E826      91       jb SWA.0, set_mode
+024E             92   check_blank:
+024E 20FB05      93       jb KEY.3, check_twelve
+0251 30FBFD      94       jnb KEY.3, $
+0254 B200        95       cpl blank
+0256             96   check_twelve:
+0256 20FA05      97       jb KEY.2, check_disp_sec
+0259 30FAFD      98       jnb KEY.2, $
+025C B201        99       cpl twelve
+025E            100   check_disp_sec:
+025E 20F905     101       jb KEY.1, main_continue
+0261 30F9FD     102       jnb KEY.1, $
+0264 B202       103       cpl disp_sec
+0266            104   main_continue:
+0266 120003     105       lcall display
+0269 08         106       inc R0
+026A B864DB     107       cjne R0, #100, main
+026D 1201FB     108       lcall incTime
+0270 7800       109       mov R0, #0
+0272 80D4       110       sjmp main
+0274            111   
+0274            112   set_mode:
+0274 7800       113       mov R0, #0
+0276 7900       114       mov R1, #0
+0278 D203       115       setb flash_flag
+027A            116   set_mode_loop:
+027A 1201EB     117       lcall wait10ms
+027D            118   check_left:
+027D 20FB09     119       jb KEY.3, check_right
+0280 30FBFD     120       jnb KEY.3, $
+0283 09         121       inc R1
+0284 B90302     122       cjne R1, #3, check_right
+0287 7900       123       mov R1, #0
+0289            124   check_right:
+0289 20F809     125       jb KEY.0, check_inc
+028C 30F8FD     126       jnb KEY.0, $
+028F 19         127       dec R1
+0290 B9FF02     128       cjne R1, #0FFH, check_inc
+0293 7902       129       mov R1, #2
+0295            130   check_inc:
+0295 20FA08     131       jb KEY.2, check_dec
+0298 30FAFD     132       jnb KEY.2, $
+029B C204       133       clr inc_dec_flag
+029D 120191     134       lcall adjust_digit
+02A0            135   check_dec:
+02A0 20F908     136       jb KEY.1, set_mode_continue
+02A3 30F9FD     137       jnb KEY.1, $
+02A6 D204       138       setb inc_dec_flag
+02A8 120191     139       lcall adjust_digit
+02AB            140   set_mode_continue:
+02AB 1200E3     141       lcall display_set
+02AE 08         142       inc R0
+02AF 30E896     143       jnb SWA.0, main
+02B2 B828C5     144       cjne R0, #40, set_mode_loop
+02B5 B203       145       cpl flash_flag
+02B7 7800       146       mov R0, #0
+02B9 80BF       147       sjmp set_mode_loop
+02BB            148   EN
