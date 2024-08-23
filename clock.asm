@@ -12,7 +12,7 @@ RELOAD_TIMER_10ms equ 65536 - (XTAL/(12*FREQ))
 dseg at 30h
 time:       ds 3 ; stored in BCD, LSD to MSD: seconds, minutes, hours
 date:       ds 3 ; stored in BCD, LSD to MSD: day, month, year 
-num_days:   ds 1 ; number of days in the current month
+num_days: ds 1 ; number of days in the current month
 
 bseg
 blank: dbit 1 

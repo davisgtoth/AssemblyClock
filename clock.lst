@@ -151,150 +151,153 @@
 0000              3   org 0000H
 0000 020227       4       ljmp init
 0003              5   
-0003              6   XTAL equ 33333333 ; variables to calcualte timing reload
-0003              7   FREQ equ 100
-0003              8   RELOAD_TIMER_10ms equ 65536 - (XTAL/(12*FREQ))
-0003              9   
-0030             10   dseg at 30h
-0030             11   time:   ds 3 ; 3 bytes, one for seconds, minutes and hours, stored in BCD
-0033             12   date:   ds 3 ; 3 bytes, one for day, month and year, stored in BCD   
-0036             13   
-0000             14   bseg
-0000             15   blank: dbit 1 ; blank flag
-0001             16   twelve: dbit 1 ; 12 hour flag
-0002             17   disp_sec: dbit 1 ; display seconds flag
-0003             18   flash_flag: dbit 1 ; flash flag
-0004             19   inc_dec_flag: dbit 1 ; increment/decrement flag
-0005             20   
+0003              6   ; variables to calcualte timing reload
+0003              7   XTAL equ 33333333 
+0003              8   FREQ equ 100
+0003              9   RELOAD_TIMER_10ms equ 65536 - (XTAL/(12*FREQ))
+0003             10   
+0003             11   ; variables to store time and date
+0030             12   dseg at 30h
+0030             13   time:       ds 3 ; stored in BCD, LSD to MSD: seconds, minutes, hours
+0033             14   date:       ds 3 ; stored in BCD, LSD to MSD: day, month, year 
+0036             15   num_days:   ds 1 ; number of days in the current month
+0037             16   
+0000             17   bseg
+0000             18   blank: dbit 1 
+0001             19   twelve: dbit 1 
+0002             20   disp_sec: dbit 1 
+0003             21   flash_flag: dbit 1 
+0004             22   inc_dec_flag: dbit 1 
+0005             23   
                  -1   $include(clock_display.asm)
 00E3             86   $LIST
                  -1   $include(clock_set.asm)
 01E1             91   $LIST
-01E1             23   
-01E1             24   cseg
-01E1             25   myLUT: ; Look-up table for 7-seg displays
-01E1 C0F9A4B0    26       DB 0C0H, 0F9H, 0A4H, 0B0H, 099H        ; 0 TO 4
+01E1             26   
+01E1             27   cseg
+01E1             28   myLUT: ; Look-up table for 7-seg displays
+01E1 C0F9A4B0    29       DB 0C0H, 0F9H, 0A4H, 0B0H, 099H        ; 0 TO 4
      99
-01E6 9282F880    27       DB 092H, 082H, 0F8H, 080H, 090H        ; 4 TO 9
+01E6 9282F880    30       DB 092H, 082H, 0F8H, 080H, 090H        ; 4 TO 9
      90
-01EB             28   
-01EB             29   wait10ms:
-01EB C28C        30       clr TR0
-01ED 758C93      31       mov TH0, #high(RELOAD_TIMER_10ms)
-01F0 758A7F      32       mov TL0, #low(RELOAD_TIMER_10ms)
-01F3 C28D        33       clr TF0
-01F5 D28C        34       setb TR0
-01F7             35   wait10ms_L0:
-01F7 308DFD      36       jnb TF0, wait10ms_L0
-01FA 22          37       ret
-01FB             38   
-01FB             39   incTime:
-01FB E530        40       mov a, time+0
-01FD 2401        41       add a, #1
-01FF D4          42       da a
-0200 B4601B      43       cjne a, #60H, incTime_ret1 ; compare to 60 in BCD
-0203 E4          44       clr a
-0204 F530        45       mov time+0, a
-0206 E531        46       mov a, time+1
-0208 2401        47       add a, #1
-020A D4          48       da a
-020B B46013      49       cjne a, #60H, incTime_ret2 ; compare to 60 in BCD
-020E E4          50       clr a
-020F F531        51       mov time+1, a
-0211 E532        52       mov a, time+2
-0213 2401        53       add a, #1
-0215 D4          54       da a
-0216 B4240B      55       cjne a, #24H, incTime_ret3 ; compare to 24 in BCD
-0219 7400        56       mov a, #0
-021B F532        57       mov time+2, a
-021D 22          58       ret
-021E             59   incTime_ret1:  
-021E F530        60       mov time+0, a
-0220 22          61       ret
-0221             62   incTime_ret2:
-0221 F531        63       mov time+1, a
-0223 22          64       ret
-0224             65   incTime_ret3:
-0224 F532        66       mov time+2, a
-0226 22          67       ret
-0227             68   
-0227             69   init:
-0227 75817F      70       mov sp, #07FH ; set stack pointer
-022A 758901      71       mov TMOD, #00000001B ; set timer 0 mode 1
-022D E4          72       clr a
-022E F5E8        73            mov LEDRA, a ; clear LEDs
-0230 F595        74            mov LEDRB, a
-0232 F8          75       mov R0, a ; register 0 used to count 10ms delays
-0233 F9          76       mov R1, a ; register 1 bits used for <fill in later>
-0234 F530        77       mov time+0, a ; clear the time variable
-0236 F531        78       mov time+1, a
-0238 F532        79       mov time+2, a
-023A F533        80       mov date+0, a
-023C F534        81       mov date+1, a
-023E F535        82       mov date+2, a
-0240 C200        83       clr blank
-0242 C201        84       clr twelve
-0244 C202        85       clr disp_sec
-0246 8000        86       sjmp main
-0248             87   
-0248             88   main:
-0248 1201EB      89       lcall wait10ms
-024B             90   check_set:
-024B 20E826      91       jb SWA.0, set_mode
-024E             92   check_blank:
-024E 20FB05      93       jb KEY.3, check_twelve
-0251 30FBFD      94       jnb KEY.3, $
-0254 B200        95       cpl blank
-0256             96   check_twelve:
-0256 20FA05      97       jb KEY.2, check_disp_sec
-0259 30FAFD      98       jnb KEY.2, $
-025C B201        99       cpl twelve
-025E            100   check_disp_sec:
-025E 20F905     101       jb KEY.1, main_continue
-0261 30F9FD     102       jnb KEY.1, $
-0264 B202       103       cpl disp_sec
-0266            104   main_continue:
-0266 120003     105       lcall display
-0269 08         106       inc R0
-026A B864DB     107       cjne R0, #100, main
-026D 1201FB     108       lcall incTime
-0270 7800       109       mov R0, #0
-0272 80D4       110       sjmp main
-0274            111   
-0274            112   set_mode:
-0274 7800       113       mov R0, #0
-0276 7900       114       mov R1, #0
-0278 D203       115       setb flash_flag
-027A            116   set_mode_loop:
-027A 1201EB     117       lcall wait10ms
-027D            118   check_left:
-027D 20FB09     119       jb KEY.3, check_right
-0280 30FBFD     120       jnb KEY.3, $
-0283 09         121       inc R1
-0284 B90302     122       cjne R1, #3, check_right
-0287 7900       123       mov R1, #0
-0289            124   check_right:
-0289 20F809     125       jb KEY.0, check_inc
-028C 30F8FD     126       jnb KEY.0, $
-028F 19         127       dec R1
-0290 B9FF02     128       cjne R1, #0FFH, check_inc
-0293 7902       129       mov R1, #2
-0295            130   check_inc:
-0295 20FA08     131       jb KEY.2, check_dec
-0298 30FAFD     132       jnb KEY.2, $
-029B C204       133       clr inc_dec_flag
-029D 120191     134       lcall adjust_digit
-02A0            135   check_dec:
-02A0 20F908     136       jb KEY.1, set_mode_continue
-02A3 30F9FD     137       jnb KEY.1, $
-02A6 D204       138       setb inc_dec_flag
-02A8 120191     139       lcall adjust_digit
-02AB            140   set_mode_continue:
-02AB 1200E3     141       lcall display_set
-02AE 08         142       inc R0
-02AF 30E896     143       jnb SWA.0, main
-02B2 B828C5     144       cjne R0, #40, set_mode_loop
-02B5 B203       145       cpl flash_flag
-02B7 7800       146       mov R0, #0
-02B9 80BF       147       sjmp set_mode_loop
-02BB            148   EN
+01EB             31   
+01EB             32   wait10ms:
+01EB C28C        33       clr TR0
+01ED 758C93      34       mov TH0, #high(RELOAD_TIMER_10ms)
+01F0 758A7F      35       mov TL0, #low(RELOAD_TIMER_10ms)
+01F3 C28D        36       clr TF0
+01F5 D28C        37       setb TR0
+01F7             38   wait10ms_L0:
+01F7 308DFD      39       jnb TF0, wait10ms_L0
+01FA 22          40       ret
+01FB             41   
+01FB             42   incTime:
+01FB E530        43       mov a, time+0
+01FD 2401        44       add a, #1
+01FF D4          45       da a
+0200 B4601B      46       cjne a, #60H, incTime_ret1 ; compare to 60 in BCD
+0203 E4          47       clr a
+0204 F530        48       mov time+0, a
+0206 E531        49       mov a, time+1
+0208 2401        50       add a, #1
+020A D4          51       da a
+020B B46013      52       cjne a, #60H, incTime_ret2 ; compare to 60 in BCD
+020E E4          53       clr a
+020F F531        54       mov time+1, a
+0211 E532        55       mov a, time+2
+0213 2401        56       add a, #1
+0215 D4          57       da a
+0216 B4240B      58       cjne a, #24H, incTime_ret3 ; compare to 24 in BCD
+0219 7400        59       mov a, #0
+021B F532        60       mov time+2, a
+021D 22          61       ret
+021E             62   incTime_ret1:  
+021E F530        63       mov time+0, a
+0220 22          64       ret
+0221             65   incTime_ret2:
+0221 F531        66       mov time+1, a
+0223 22          67       ret
+0224             68   incTime_ret3:
+0224 F532        69       mov time+2, a
+0226 22          70       ret
+0227             71   
+0227             72   init:
+0227 75817F      73       mov sp, #07FH ; set stack pointer
+022A 758901      74       mov TMOD, #00000001B ; set timer 0 mode 1
+022D E4          75       clr a
+022E F5E8        76            mov LEDRA, a ; clear LEDs
+0230 F595        77            mov LEDRB, a
+0232 F8          78       mov R0, a ; register 0 used to count 10ms delays
+0233 F9          79       mov R1, a ; register 1 bits used for <fill in later>
+0234 F530        80       mov time+0, a ; clear the time variable
+0236 F531        81       mov time+1, a
+0238 F532        82       mov time+2, a
+023A F533        83       mov date+0, a
+023C F534        84       mov date+1, a
+023E F535        85       mov date+2, a
+0240 C200        86       clr blank
+0242 C201        87       clr twelve
+0244 C202        88       clr disp_sec
+0246 8000        89       sjmp main
+0248             90   
+0248             91   main:
+0248 1201EB      92       lcall wait10ms
+024B             93   check_set:
+024B 20E826      94       jb SWA.0, set_mode
+024E             95   check_blank:
+024E 20FB05      96       jb KEY.3, check_twelve
+0251 30FBFD      97       jnb KEY.3, $
+0254 B200        98       cpl blank
+0256             99   check_twelve:
+0256 20FA05     100       jb KEY.2, check_disp_sec
+0259 30FAFD     101       jnb KEY.2, $
+025C B201       102       cpl twelve
+025E            103   check_disp_sec:
+025E 20F905     104       jb KEY.1, main_continue
+0261 30F9FD     105       jnb KEY.1, $
+0264 B202       106       cpl disp_sec
+0266            107   main_continue:
+0266 120003     108       lcall display
+0269 08         109       inc R0
+026A B864DB     110       cjne R0, #100, main
+026D 1201FB     111       lcall incTime
+0270 7800       112       mov R0, #0
+0272 80D4       113       sjmp main
+0274            114   
+0274            115   set_mode:
+0274 7800       116       mov R0, #0
+0276 7900       117       mov R1, #0
+0278 D203       118       setb flash_flag
+027A            119   set_mode_loop:
+027A 1201EB     120       lcall wait10ms
+027D            121   check_left:
+027D 20FB09     122       jb KEY.3, check_right
+0280 30FBFD     123       jnb KEY.3, $
+0283 09         124       inc R1
+0284 B90302     125       cjne R1, #3, check_right
+0287 7900       126       mov R1, #0
+0289            127   check_right:
+0289 20F809     128       jb KEY.0, check_inc
+028C 30F8FD     129       jnb KEY.0, $
+028F 19         130       dec R1
+0290 B9FF02     131       cjne R1, #0FFH, check_inc
+0293 7902       132       mov R1, #2
+0295            133   check_inc:
+0295 20FA08     134       jb KEY.2, check_dec
+0298 30FAFD     135       jnb KEY.2, $
+029B C204       136       clr inc_dec_flag
+029D 120191     137       lcall adjust_digit
+02A0            138   check_dec:
+02A0 20F908     139       jb KEY.1, set_mode_continue
+02A3 30F9FD     140       jnb KEY.1, $
+02A6 D204       141       setb inc_dec_flag
+02A8 120191     142       lcall adjust_digit
+02AB            143   set_mode_continue:
+02AB 1200E3     144       lcall display_set
+02AE 08         145       inc R0
+02AF 30E896     146       jnb SWA.0, main
+02B2 B828C5     147       cjne R0, #40, set_mode_loop
+02B5 B203       148       cpl flash_flag
+02B7 7800       149       mov R0, #0
+02B9 80BF       150       sjmp set_mode_loop
+02BB            151   EN
