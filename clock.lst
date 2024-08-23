@@ -1,3 +1,9 @@
+0000              1   ;------------------------------------------------------------------------------
+0000              2   ; Filename: clock.asm
+0000              3   ; Author: Davis Toth
+0000              4   ; Date: 2024-08-22
+0000              5   ; Description: 
+0000              6   ;------------------------------------------------------------------------------
                  -1   $MODDE0CV 
 0000              1   ;  MODDDE2: Register definition for DE2-8052 softcore
 0000              2   ;
@@ -147,157 +153,192 @@
 0000            146   FLASH_ADD1 data 0E2H ; address bits 8 to 15.
 0000            147   FLASH_ADD2 data 0E3H ; address bits 16 to 21.
 0000            148   
-0000              2   
-0000              3   org 0000H
-0000 020227       4       ljmp init
-0003              5   
-0003              6   ; variables to calcualte timing reload
-0003              7   XTAL equ 33333333 
-0003              8   FREQ equ 100
-0003              9   RELOAD_TIMER_10ms equ 65536 - (XTAL/(12*FREQ))
-0003             10   
-0003             11   ; variables to store time and date
-0030             12   dseg at 30h
-0030             13   time:       ds 3 ; stored in BCD, LSD to MSD: seconds, minutes, hours
-0033             14   date:       ds 3 ; stored in BCD, LSD to MSD: day, month, year 
-0036             15   num_days:   ds 1 ; number of days in the current month
-0037             16   
-0000             17   bseg
-0000             18   blank: dbit 1 
-0001             19   twelve: dbit 1 
-0002             20   disp_sec: dbit 1 
-0003             21   flash_flag: dbit 1 
-0004             22   inc_dec_flag: dbit 1 
-0005             23   
-                 -1   $include(clock_display.asm)
-00E3             86   $LIST
-                 -1   $include(clock_set.asm)
-01E1             91   $LIST
-01E1             26   
-01E1             27   cseg
-01E1             28   myLUT: ; Look-up table for 7-seg displays
-01E1 C0F9A4B0    29       DB 0C0H, 0F9H, 0A4H, 0B0H, 099H        ; 0 TO 4
+0000              8   
+0000              9   org 0000H
+0000 0203ED      10       ljmp init
+0003             11   
+0003             12   ;------------------------------------------------------------------------------
+0003             13   ; Data Section: Variables, flags, and BCD to 7-segment lookup table
+0003             14   ;------------------------------------------------------------------------------
+0003             15   
+0003             16   ; variables to store time and date
+0030             17   dseg at 30h
+0030             18   time:       ds 3 ; stored in BCD in 24-hour format, LSD to MSD: seconds, minutes, hours
+0033             19   date:       ds 3 ; stored in BCD, LSD to MSD: day, month, year 
+0036             20   num_days:   ds 1 ; number of days in the current month + 1 to compare for overflow
+0037             21   
+0037             22   ; flags for various uses
+0000             23   bseg
+0000             24   twelve:         dbit 1 ; when set, displays time in 12-hour format
+0001             25   hide_sec:       dbit 1 ; when set, doesn't display seconds - blanks HEX0 and HEX1 if in 24-hour mode, shows AM/PM if in 12-hour mode
+0002             26   disp_date:      dbit 1 ; when set, displays the date instead of the time in the form MM/DD/YY
+0003             27   blank:          dbit 1 ; when set, blanks the hex displays
+0004             28   enter_set:      dbit 1 ; flag used to enter the set mode
+0005             29   flash_flag:     dbit 1 ; flag used to flash the hex displays when setting the time/date
+0006             30   dec_flag:       dbit 1 ; flag used to decrement the digit when setting the time/date
+0007             31   
+0007             32   ; subroutine files included
+                 -1   $include(subroutines/time.asm)
+0007              1   ;------------------------------------------------------------------------------
+0007              2   ; Filename: time.asm
+0007              3   ; Author: Davis Toth
+0007              4   ; Date: 2024-08-22
+0007              5   ; Description: 
+0007              6   ;------------------------------------------------------------------------------
+0041             58   $LIST
+                 -1   $include(subroutines/date.asm)
+0041              1   ;------------------------------------------------------------------------------
+0041              2   ; Filename: date.asm
+0041              3   ; Author: Davis Toth
+0041              4   ; Date: 2024-08-22
+0041              5   ; Description: 
+0041              6   ;------------------------------------------------------------------------------
+00C5            105   $LIST
+                 -1   $include(subroutines/display.asm)
+00C5              1   ;------------------------------------------------------------------------------
+00C5              2   ; Filename: display.asm
+00C5              3   ; Author: Davis Toth
+00C5              4   ; Date: 2024-08-22
+00C5              5   ; Description: 
+00C5              6   ;------------------------------------------------------------------------------
+0329            194   $LIST
+                 -1   $include(subroutines/set_mode.asm)
+0329              1   ;------------------------------------------------------------------------------
+0329              2   ; Filename: set_mode.asm
+0329              3   ; Author: Davis Toth
+0329              4   ; Date: 2024-08-22
+0329              5   ; Description: 
+0329              6   ;------------------------------------------------------------------------------
+03E3            143   $LIST
+03E3             37   
+03E3             38   ; Look-up table for 7-seg displays
+03E3             39   ; note: segments turn on with logic 0
+03E3             40   cseg
+03E3             41   myLUT: ; Look-up table for 7-seg displays
+03E3 C0F9A4B0    42       DB 0C0H, 0F9H, 0A4H, 0B0H, 099H        ; 0 TO 4
      99
-01E6 9282F880    30       DB 092H, 082H, 0F8H, 080H, 090H        ; 4 TO 9
+03E8 9282F880    43       DB 092H, 082H, 0F8H, 080H, 090H        ; 4 TO 9
      90
-01EB             31   
-01EB             32   wait10ms:
-01EB C28C        33       clr TR0
-01ED 758C93      34       mov TH0, #high(RELOAD_TIMER_10ms)
-01F0 758A7F      35       mov TL0, #low(RELOAD_TIMER_10ms)
-01F3 C28D        36       clr TF0
-01F5 D28C        37       setb TR0
-01F7             38   wait10ms_L0:
-01F7 308DFD      39       jnb TF0, wait10ms_L0
-01FA 22          40       ret
-01FB             41   
-01FB             42   incTime:
-01FB E530        43       mov a, time+0
-01FD 2401        44       add a, #1
-01FF D4          45       da a
-0200 B4601B      46       cjne a, #60H, incTime_ret1 ; compare to 60 in BCD
-0203 E4          47       clr a
-0204 F530        48       mov time+0, a
-0206 E531        49       mov a, time+1
-0208 2401        50       add a, #1
-020A D4          51       da a
-020B B46013      52       cjne a, #60H, incTime_ret2 ; compare to 60 in BCD
-020E E4          53       clr a
-020F F531        54       mov time+1, a
-0211 E532        55       mov a, time+2
-0213 2401        56       add a, #1
-0215 D4          57       da a
-0216 B4240B      58       cjne a, #24H, incTime_ret3 ; compare to 24 in BCD
-0219 7400        59       mov a, #0
-021B F532        60       mov time+2, a
-021D 22          61       ret
-021E             62   incTime_ret1:  
-021E F530        63       mov time+0, a
-0220 22          64       ret
-0221             65   incTime_ret2:
-0221 F531        66       mov time+1, a
-0223 22          67       ret
-0224             68   incTime_ret3:
-0224 F532        69       mov time+2, a
-0226 22          70       ret
-0227             71   
-0227             72   init:
-0227 75817F      73       mov sp, #07FH ; set stack pointer
-022A 758901      74       mov TMOD, #00000001B ; set timer 0 mode 1
-022D E4          75       clr a
-022E F5E8        76            mov LEDRA, a ; clear LEDs
-0230 F595        77            mov LEDRB, a
-0232 F8          78       mov R0, a ; register 0 used to count 10ms delays
-0233 F9          79       mov R1, a ; register 1 bits used for <fill in later>
-0234 F530        80       mov time+0, a ; clear the time variable
-0236 F531        81       mov time+1, a
-0238 F532        82       mov time+2, a
-023A F533        83       mov date+0, a
-023C F534        84       mov date+1, a
-023E F535        85       mov date+2, a
-0240 C200        86       clr blank
-0242 C201        87       clr twelve
-0244 C202        88       clr disp_sec
-0246 8000        89       sjmp main
-0248             90   
-0248             91   main:
-0248 1201EB      92       lcall wait10ms
-024B             93   check_set:
-024B 20E826      94       jb SWA.0, set_mode
-024E             95   check_blank:
-024E 20FB05      96       jb KEY.3, check_twelve
-0251 30FBFD      97       jnb KEY.3, $
-0254 B200        98       cpl blank
-0256             99   check_twelve:
-0256 20FA05     100       jb KEY.2, check_disp_sec
-0259 30FAFD     101       jnb KEY.2, $
-025C B201       102       cpl twelve
-025E            103   check_disp_sec:
-025E 20F905     104       jb KEY.1, main_continue
-0261 30F9FD     105       jnb KEY.1, $
-0264 B202       106       cpl disp_sec
-0266            107   main_continue:
-0266 120003     108       lcall display
-0269 08         109       inc R0
-026A B864DB     110       cjne R0, #100, main
-026D 1201FB     111       lcall incTime
-0270 7800       112       mov R0, #0
-0272 80D4       113       sjmp main
-0274            114   
-0274            115   set_mode:
-0274 7800       116       mov R0, #0
-0276 7900       117       mov R1, #0
-0278 D203       118       setb flash_flag
-027A            119   set_mode_loop:
-027A 1201EB     120       lcall wait10ms
-027D            121   check_left:
-027D 20FB09     122       jb KEY.3, check_right
-0280 30FBFD     123       jnb KEY.3, $
-0283 09         124       inc R1
-0284 B90302     125       cjne R1, #3, check_right
-0287 7900       126       mov R1, #0
-0289            127   check_right:
-0289 20F809     128       jb KEY.0, check_inc
-028C 30F8FD     129       jnb KEY.0, $
-028F 19         130       dec R1
-0290 B9FF02     131       cjne R1, #0FFH, check_inc
-0293 7902       132       mov R1, #2
-0295            133   check_inc:
-0295 20FA08     134       jb KEY.2, check_dec
-0298 30FAFD     135       jnb KEY.2, $
-029B C204       136       clr inc_dec_flag
-029D 120191     137       lcall adjust_digit
-02A0            138   check_dec:
-02A0 20F908     139       jb KEY.1, set_mode_continue
-02A3 30F9FD     140       jnb KEY.1, $
-02A6 D204       141       setb inc_dec_flag
-02A8 120191     142       lcall adjust_digit
-02AB            143   set_mode_continue:
-02AB 1200E3     144       lcall display_set
-02AE 08         145       inc R0
-02AF 30E896     146       jnb SWA.0, main
-02B2 B828C5     147       cjne R0, #40, set_mode_loop
-02B5 B203       148       cpl flash_flag
-02B7 7800       149       mov R0, #0
-02B9 80BF       150       sjmp set_mode_loop
-02BB            151   EN
+03ED             44   
+03ED             45   ;------------------------------------------------------------------------------
+03ED             46   ; Main Program
+03ED             47   ;------------------------------------------------------------------------------
+03ED             48   
+03ED             49   ; Initialization
+03ED             50   init:
+03ED 75817F      51       mov sp, #07FH ; set stack pointer
+03F0 758901      52       mov TMOD, #00000001B ; set timer 0 to mode 1
+03F3 E4          53       clr a
+03F4 F5E8        54            mov LEDRA, a ; clear LEDs
+03F6 F595        55            mov LEDRB, a
+03F8 F8          56       mov R0, a ; register 0 used to count 10ms delays
+03F9 F530        57       mov time+0, a ; initialize the time to 00:00:00
+03FB F531        58       mov time+1, a
+03FD F532        59       mov time+2, a
+03FF 753301      60       mov date+0, #01H ; initialize the date to 01/01/00
+0402 753401      61       mov date+1, #01H
+0405 753500      62       mov date+2, #00H
+0408 120041      63       lcall set_num_days ; initialize num_days
+040B C200        64       clr twelve ; clear all flags
+040D C201        65       clr hide_sec
+040F C202        66       clr disp_date
+0411 C203        67       clr blank 
+0413 C204        68       clr enter_set
+0415 C205        69       clr flash_flag
+0417 C206        70       clr dec_flag
+0419 8000        71       sjmp main
+041B             72   
+041B             73   ; Main loop - counts and displays time, checks for inputs from buttons modifying flags accordingly
+041B             74   ; Notes:
+041B             75   ;   - R0 used to count 10ms delays
+041B             76   ;   - R4 used to count 10ms delays for displaying date for 2 seconds
+041B             77   ;   - KEY3 = 12/24 hour format, KEY2 = hide seconds/show AM/PM, KEY1 = display date, KEY0 = blank the 7-seg displays
+041B             78   ;   - enters set mode from enter_set flag, i.e. if either switch 0 or 1 is flipped
+041B             79   main:
+041B 120003      80       lcall wait10ms
+041E             81   check_set:
+041E 1203D7      82       lcall check_enter_set
+0421 200439      83       jb enter_set, set_mode
+0424             84   check_twelve:
+0424 20FB05      85       jb KEY.3, check_hide_sec
+0427 30FBFD      86       jnb KEY.3, $
+042A B200        87       cpl twelve
+042C             88   check_hide_sec:
+042C 20FA05      89       jb KEY.2, check_disp_date
+042F 30FAFD      90       jnb KEY.2, $
+0432 B201        91       cpl hide_sec
+0434             92   check_disp_date:
+0434 20F907      93       jb KEY.1, check_blank
+0437 30F9FD      94       jnb KEY.1, $
+043A D202        95       setb disp_date
+043C 7C00        96       mov R4, #0
+043E             97   check_blank:
+043E 20F805      98       jb KEY.0, main_continue
+0441 30F8FD      99       jnb KEY.0, $
+0444 B203       100       cpl blank
+0446            101   main_continue:
+0446 300206     102       jnb disp_date, main_no_date
+0449 0C         103       inc R4
+044A BCC802     104       cjne R4, #200, main_no_date ; 200 * 10ms = 2 seconds
+044D C202       105       clr disp_date
+044F            106   main_no_date:
+044F 1200C5     107       lcall display
+0452 08         108       inc R0
+0453 B864C5     109       cjne R0, #100, main ; 100 * 10ms = 1 second
+0456 120013     110       lcall incTime
+0459 7800       111       mov R0, #0
+045B 80BE       112       sjmp main
+045D            113   
+045D            114   ; Set mode - allows the user to set the time and date
+045D            115   ; Notes:
+045D            116   ;   - R0 is used to count 10ms delays, 
+045D            117   ;   - R1 is used to determine which digit is currently selected to be set
+045D            118   ;       - 0 = sec/year (HEX0 and HEX1)
+045D            119   ;       - 1 = min/day (HEX2 and HEX3)
+045D            120   ;       - 2 = hr/month (HEX4 and HEX5)
+045D            121   ;       - all other values undefined 
+045D            122   ;   - KEY3 = move left, KEY2 = increment, KEY1 = decrement, KEY0 = move right
+045D            123   ;   - returns to main if enter_set flag is cleared, i.e. both switches 0 and 1 are off
+045D            124   set_mode:
+045D 7800       125       mov R0, #0 
+045F 7900       126       mov R1, #0 ; initialize selected digit to sec/year
+0461 C202       127       clr disp_date ; if enters set mode while displaying date, will stop and flash time/date
+0463 D205       128       setb flash_flag ; starts by having sec/year off 
+0465            129   set_mode_loop:
+0465 120003     130       lcall wait10ms
+0468            131   check_left:
+0468 20FB09     132       jb KEY.3, check_right
+046B 30FBFD     133       jnb KEY.3, $
+046E 09         134       inc R1
+046F B90302     135       cjne R1, #3, check_right
+0472 7900       136       mov R1, #0
+0474            137   check_right:
+0474 20F809     138       jb KEY.0, check_inc
+0477 30F8FD     139       jnb KEY.0, $
+047A 19         140       dec R1
+047B B9FF02     141       cjne R1, #0FFH, check_inc
+047E 7902       142       mov R1, #2
+0480            143   check_inc:
+0480 20FA0B     144       jb KEY.2, check_dec
+0483 30FAFD     145       jnb KEY.2, $
+0486 C206       146       clr dec_flag
+0488 120329     147       lcall adjust_digit
+048B 120041     148       lcall set_num_days ; update num_days in case month was changed to not display invalid date
+048E            149   check_dec:
+048E 20F90B     150       jb KEY.1, set_mode_continue
+0491 30F9FD     151       jnb KEY.1, $
+0494 D206       152       setb dec_flag
+0496 120329     153       lcall adjust_digit
+0499 120041     154       lcall set_num_days ; update num_days in case month was changed to not display invalid date
+049C            155   set_mode_continue:
+049C 1201D6     156       lcall display_set
+049F 08         157       inc R0
+04A0 1203D7     158       lcall check_enter_set
+04A3 300409     159       jnb enter_set, set_mode_exit
+04A6 B828BC     160       cjne R0, #40, set_mode_loop
+04A9 B205       161       cpl flash_flag
+04AB 7800       162       mov R0, #0
+04AD 80B6       163       sjmp set_mode_loop
+04AF            164   set_mode_exit:
+04AF 02041B     165       ljmp main
+04B2            166   EN

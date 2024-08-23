@@ -15,7 +15,7 @@ org 0000H
 ;------------------------------------------------------------------------------
 
 ; variables to calcualte timing reload
-XTAL equ 33333333 ; variables to calcualte timing reload
+XTAL equ 33333333
 FREQ equ 100
 RELOAD_TIMER_10ms equ 65536 - (XTAL/(12*FREQ))
 
