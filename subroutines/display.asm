@@ -8,7 +8,8 @@ $NOLIST
 
 CSEG
 
-; Macro: showBCD - displays a two digit BCD number on the 7-seg displays
+; Macro: showBCD
+; Description: displays a two digit BCD number on the 7-seg displays
 ; Inputs: %0 - the register/variable containing a BCD number to display
 ;         %1 - the HEX display to show the LSD
 ;         %2 - the HEX display to show the MSD
@@ -28,7 +29,8 @@ showBCD MAC
     mov %2, a
 ENDMAC
 
-; Subroutine: display - shows the time/date on the 7-seg displays in various formats
+; Subroutine: display
+; Description: shows the time/date on the 7-seg displays in various formats
 ; Reads: time+0, time+1, time+2, date+0, date+1, date+2, blank, disp_date, twelve, hide_sec
 ; Modifies: a, dptr, HEX0, HEX1, HEX2, HEX3, HEX4, HEX5
 ; Formats: 
@@ -114,8 +116,9 @@ display_twelve_show_am:
     mov HEX1, #88H ; display A
     ret
 
-; Subroutine: display_set - shows the time/date on the 7-seg displays when in set mode
-;                           flashing the selected digit (pair of hex displays) on/off
+; Subroutine: display_set
+; Description: shows the time/date on the 7-seg displays when in set mode
+;              flashing the selected digit (pair of hex displays) on/off
 ; Modifies: a, dptr, HEX0, HEX1, HEX2, HEX3, HEX4, HEX5
 ; Reads: time+0, time+1, time+2, date+0, date+1, date+2, R1, flash_flag, SWA.1
 ; Notes:

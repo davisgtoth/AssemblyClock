@@ -8,7 +8,8 @@ $NOLIST
 
 CSEG
 
-; Subroutine: adjust_digit - increments/decrements the selected digit when in set mode
+; Subroutine: adjust_digit
+; Description: increments/decrements the selected digit when in set mode
 ; Modifies: a, c, time+0, time+1, time+2, date+0, date+1, date+2, R0, R2 
 ; Reads: num_days, R1, SWA.1, flash_flag, dec_flag
 ; Notes:
@@ -127,7 +128,8 @@ adjust_ret:
     mov R0, #0 ; reset frequency of flashing on/off
     ret
 
-; Subroutine: check_enter_set - checks if switches 0 or 1 are flipped 
+; Subroutine: check_enter_set
+; Description: checks if switches 0 or 1 are flipped 
 ; Modifies: enter_set 
 ; Reads: SWA.0, SWA.1
 ; Notes: goes into set mode if enter_set is set, shows time/date if cleared

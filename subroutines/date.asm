@@ -8,7 +8,8 @@ $NOLIST
 
 CSEG
 
-; Subroutine: set_num_days - sets the number of days in the current month
+; Subroutine: set_num_days 
+; Description: sets the number of days in the current month
 ; Modifies: a, num_days
 ; Reads: date+1, date+2
 set_num_days:
@@ -46,7 +47,8 @@ set_num_days_31_continue:
     mov num_days, #32H ; 31 day month, compare to 32 for overflow
     ret
 
-; Subroutine: incDate - increments the date by 1 day, adjusting the month and year as needed
+; Subroutine: incDate 
+; Description: increments the date by 1 day, adjusting the month and year as necessary
 ; Modifies: a, date+0, date+1, date+2
 ; Reads: num_days
 incDate:
@@ -77,7 +79,8 @@ incDate_ret3:
     mov date+2, a
     ret
 
-; Subroutine: check_days - checks if the date is valid for the current month, adjusting as needed           
+; Subroutine: check_days 
+; Description: checks if the date is valid for the current month, adjusting as needed           
 ; Modifies: a, c, date+0
 ; Reads: date+0, num_days
 ; Notes: used to not allow invalid dates when setting the date

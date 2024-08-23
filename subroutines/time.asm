@@ -13,7 +13,8 @@ RELOAD_TIMER_10ms equ 65536 - (XTAL/(12*FREQ))
 
 CSEG
 
-; Subroutine: wait10ms - uses timer 0 to wait 10ms
+; Subroutine: wait10ms 
+; Description: uses timer 0 to wait 10ms
 ; Modifies: TR0, TH0, TL0, TF0
 ; Reads: RELOAD_TIMER_10ms
 wait10ms:
@@ -25,7 +26,8 @@ wait10ms:
     jnb TF0, $
     ret
 
-; Subroutine: incTime - increments the time by 1 second, adjusting minutes, hours, and date as needed
+; Subroutine: incTime
+; Description: increments the time by 1 second, adjusting minutes, hours, and date as needed
 ; Modifies: a, time+0, time+1, time+2, date+0, date+1, date+2
 incTime:
     mov a, time+0
