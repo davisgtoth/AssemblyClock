@@ -1,12 +1,29 @@
 ;------------------------------------------------------------------------------
 ; Filename: set_mode.asm
 ; Author: Davis Toth
-; Date: 2024-08-22
-; Description: 
+; Date: 2024-08-24
+; Description: This file contains the subroutines related to setting the time
+;              and date on the clock. This includes a subroutine that increments
+;              or decrements the time/date and a subroutine that checks if the
+;              clock has entered into set mode.
 ;------------------------------------------------------------------------------
 $NOLIST
 
 CSEG
+
+; Subroutine: check_enter_set
+; Description: checks if switches 0 or 1 are flipped 
+; Modifies: enter_set 
+; Reads: SWA.0, SWA.1
+; Notes: goes into set mode if enter_set is set, shows time/date if cleared
+check_enter_set:
+    jb SWA.0, enter_set_mode
+    jb SWA.1, enter_set_mode
+    clr enter_set
+    ret
+enter_set_mode:
+    setb enter_set
+    ret
 
 ; Subroutine: adjust_digit
 ; Description: increments/decrements the selected digit when in set mode
@@ -126,20 +143,6 @@ adjust_ret:
     mov @R0, a
     clr flash_flag ; cleared to immediately display updated value
     mov R0, #0 ; reset frequency of flashing on/off
-    ret
-
-; Subroutine: check_enter_set
-; Description: checks if switches 0 or 1 are flipped 
-; Modifies: enter_set 
-; Reads: SWA.0, SWA.1
-; Notes: goes into set mode if enter_set is set, shows time/date if cleared
-check_enter_set:
-    jb SWA.0, enter_set_mode
-    jb SWA.1, enter_set_mode
-    clr enter_set
-    ret
-enter_set_mode:
-    setb enter_set
     ret
 
 $LIST

@@ -1,8 +1,12 @@
 ;------------------------------------------------------------------------------
 ; Filename: date.asm
 ; Author: Davis Toth
-; Date: 2024-08-22
-; Description: 
+; Date: 2024-08-24
+; Description: This file contains subroutines related to datekeeping of the
+;              clock, including a subroutine that sets a variable containing
+;              the number of days in the current month, a subroutine that
+;              increments the date, and a subroutine that ensures the current
+;              date is valid given what the month is.
 ;------------------------------------------------------------------------------
 $NOLIST
 

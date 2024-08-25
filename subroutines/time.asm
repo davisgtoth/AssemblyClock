@@ -1,8 +1,10 @@
 ;------------------------------------------------------------------------------
 ; Filename: time.asm
 ; Author: Davis Toth
-; Date: 2024-08-22
-; Description: 
+; Date: 2024-08-24
+; Description: This file contains subroutines related to timekeeping of the 
+;              clock, including a delay subroutine used to keep track of time 
+;              and a subroutine to increment the time.
 ;------------------------------------------------------------------------------
 $NOLIST
 

@@ -1,8 +1,12 @@
 ;------------------------------------------------------------------------------
 ; Filename: display.asm
 ; Author: Davis Toth
-; Date: 2024-08-22
-; Description: 
+; Date: 2024-08-24
+; Description: This file contains subroutines and macros related to displaying 
+;              the time and date on the 7-segment displays. This includes a 
+;              macro that displays a BCD number, a subroutine that displays the
+;              time/date in various formats, and a subroutine that displays the
+;              time/date when in set mode.
 ;------------------------------------------------------------------------------
 $NOLIST
 

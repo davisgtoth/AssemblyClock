@@ -1,8 +1,16 @@
 ;------------------------------------------------------------------------------
 ; Filename: clock.asm
 ; Author: Davis Toth
-; Date: 2024-08-22
-; Description: 
+; Date: 2024-08-25
+; Description: This assembly program is designed to implement a digital clock
+;              on the Terasic DE0-CV FPGA board. The clock supports both 24-hour
+;              and 12-hour time formats and can display the date on the 6 buit-in
+;              7-segment displays. The time and date can be set using the switches
+;              and buttons on the board. The clock also has a features to blank the
+;              displays and hide the seconds. The program uses several subroutines
+;              to handle timekeeping, datekeeping, display, and setting the time/date.
+;              This file contains the main program loop for both normal operation
+;              and setting the time/date.
 ;------------------------------------------------------------------------------
 $MODDE0CV 
 
