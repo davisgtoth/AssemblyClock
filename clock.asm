@@ -1,7 +1,7 @@
 ;------------------------------------------------------------------------------
 ; Filename: clock.asm
 ; Author: Davis Toth
-; Date: 2024-08-25
+; Date: 2024-09-07
 ; Description: This assembly program is designed to implement a digital clock
 ;              on the Terasic DE0-CV FPGA board. The clock supports both 24-hour
 ;              and 12-hour time formats and can display the date on the 6 buit-in
@@ -23,14 +23,16 @@ org 0000H
 
 ; variables to store time and date
 dseg at 30h
-time:       ds 3 ; stored in BCD in 24-hour format, LSD to MSD: seconds, minutes, hours
-date:       ds 3 ; stored in BCD, LSD to MSD: day, month, year 
-num_days:   ds 1 ; number of days in the current month + 1 to compare for overflow
+time:           ds 3 ; stored in BCD in 24-hour format, LSD to MSD: seconds, minutes, hours
+date:           ds 3 ; stored in BCD, LSD to MSD: day, month, year 
+twelve_hour:    ds 1 ; stores the hour in 12 hour format
+num_days:       ds 1 ; number of days in the current month + 1 to compare for overflow
 
 ; flags for various uses
 bseg
 twelve:         dbit 1 ; when set, displays time in 12-hour format
 hide_sec:       dbit 1 ; when set, doesn't display seconds - blanks HEX0 and HEX1 if in 24-hour mode, shows AM/PM if in 12-hour mode
+pm_flag:        dbit 1 ; flag to indicate PM when in 12-hour mode
 disp_date:      dbit 1 ; when set, displays the date instead of the time in the form MM/DD/YY
 blank:          dbit 1 ; when set, blanks the hex displays
 enter_set:      dbit 1 ; flag used to enter the set mode
@@ -67,8 +69,9 @@ init:
     mov time+2, a
     mov date+0, #01H ; initialize the date to 01/01/00
     mov date+1, #01H
-    mov date+2, #00H
+    mov date+2, #24H
     lcall set_num_days ; initialize num_days
+    lcall set_twelve_hour ; initialize twelve_hour and pm_flag
     clr twelve ; clear all flags
     clr hide_sec
     clr disp_date
@@ -170,5 +173,6 @@ set_mode_continue:
     mov R0, #0
     sjmp set_mode_loop
 set_mode_exit:
+    lcall set_twelve_hour ; update twelve_hour and pm_flag
     ljmp main
 END

@@ -1,7 +1,7 @@
 ;------------------------------------------------------------------------------
 ; Filename: display.asm
 ; Author: Davis Toth
-; Date: 2024-08-24
+; Date: 2024-09-07
 ; Description: This file contains subroutines and macros related to displaying 
 ;              the time and date on the 7-segment displays. This includes a 
 ;              macro that displays a BCD number, a subroutine that displays the
@@ -77,47 +77,18 @@ display_date:
     ret
 
 display_twelve:
+    showBCD(twelve_hour, HEX4, HEX5) ; show hr
     showBCD(time+1, HEX2, HEX3) ; show min
-    clr c
-    mov a, time+2
-    subb a, #12H ; do hour - 12, result in a
-    jc display_twelve_am ; if carry is set, hour < 12 so carry set = AM, carry cleared = PM (if not dispalying seconds)
-    cjne a, #0, display_twelve_pm ; if hour - 12 = 0, is exactly 12PM
-    showBCD(#12H, HEX4, HEX5) ; show 12 for hr
-    sjmp display_twelve_sec
-display_twelve_pm:
-    ; check if LSD is greater than 9, if so, subtract 6 to adjust to valid BCD
-    mov R3, a
-    anl a, #0FH
-    subb a, #0AH ; carry already cleared because PM
-    jc display_twelve_pm_continue
-    mov a, R3
-    subb a, #06H ; carry cleared because jc display_twelve_pm_continue didn't jump
-    mov R3, a
-display_twelve_pm_continue:
-    showBCD(R3, HEX4, HEX5) ; show hr adjusted for pm
-    clr c ; make sure set to PM for later
-    sjmp display_twelve_sec
-display_twelve_am:
-    mov a, time+2
-    cjne a, #0, display_twelve_am_not_zero
-    showBCD(#12H, HEX4, HEX5) ; show 12 for hr, is 12 AM = 00 in 24-hour format
-    setb c ; cjne modifies carry, make sure set to AM for later
-    sjmp display_twelve_sec
-display_twelve_am_not_zero:
-    setb c ; cjne modifies carry, make sure set to AM for later
-    showBCD(time+2, HEX4, HEX5) ; show hr with no modifications for AM (if not 00)
-display_twelve_sec:
-    jb hide_sec, display_twelve_ampm
+    jb hide_sec, display_twelve_no_sec
     showBCD(time+0, HEX0, HEX1) ; show sec
     ret
-display_twelve_ampm:
+display_twelve_no_sec:
     mov HEX0, #0C8H ; display M
-    jc display_twelve_show_am ; if carry set, is AM
-    mov HEX1, #8CH ; display P
-    ret
-display_twelve_show_am:
+    jb pm_flag, display_twelve_no_sec_pm
     mov HEX1, #88H ; display A
+    ret
+display_twelve_no_sec_pm:
+    mov HEX1, #8CH ; display P
     ret
 
 ; Subroutine: display_set
