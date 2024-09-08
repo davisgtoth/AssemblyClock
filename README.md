@@ -4,16 +4,27 @@ This repo contains code in assembly language that turns the DE0-CV FPGA board in
 
 ## User Guide
 ### Setup
+run a to compile the code
+```bash
+% ./a
+
+1) clock.asm
+2) Quit
+Please select a file to compile: 1
+Compiling clock.asm
+No errors found
+```
 
 ### Modes
 
 ## File Details 
 ```bash
 Assembly Clock
-├── MODDE0CV 
-├── a 
-├── a51 
-├── b  
+├── MODDE0CV
+├── README.md
+├── a
+├── a51
+├── b
 ├── backup
 │   └── clock_backup.asm
 ├── clock.asm
@@ -25,3 +36,4 @@ Assembly Clock
     ├── display.asm
     ├── set_mode.asm
     └── time.asm
+```
