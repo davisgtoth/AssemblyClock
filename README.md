@@ -1,6 +1,8 @@
 # DE0-CV FPGA Board Clock
 
-This repository contains code in 8051 Assembly language that turns the DE0-CV FPGA board into a digital clock. The code makes use of the six 7-segment hexadecimal displays to show the time in `hr:min:sec` and date in `MM/DD/YY`. The four push buttons and two of the switches are used to set the clock and switch between various display modes. 
+This repository contains code in 8051 Assembly language that turns the DE0-CV FPGA board into a digital clock. The code makes use of the six 7-segment hexadecimal displays to show the time in `hr:min:sec` and date in `MM/DD/YY`. The four push buttons and two of the switches are used to set the clock and switch between various display modes.  
+
+  
 ![Clock Demo](./gifs/demo.gif)
 
 ## User Guide
