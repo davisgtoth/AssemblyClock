@@ -1,20 +1,29 @@
 # DE0-CV FPGA Board Clock
 
-This repository contains code in 8051 Assembly language that turns the DE0-CV FPGA board into a digital clock. The code makes use of the six 7-segment hexadecimal displays to show the time in `hr:min:sec` and date in `MM/DD/YY`. The four push buttons and two of the switches are used to set the clock and switch between various display modes.  
+This repository contains a project where the **DE0-CV FPGA board** is programmed to function as a **digital clock**, using **8051 Assembly language**. The project demonstrates skills in low-level embedded systems programming, hardware-software interfacing, and real-time control, focusing on the use of **7-segment displays** for time and date output.
+
+The code leverages the 8051 microcontroller's architecture to control the DE0-CV board's hardware components, showcasing a hands-on understanding of microcontroller programming and hardware manipulation.
   
-![Clock Demo](./gifs/demo.gif)
+![Clock Demo](./gifs/demo.gif)  
+_The clock running on the DE0-CV board, displaying the time._
 
 ## User Guide
-### Setup
-To set the time of the clock, switch `SW0` is flipped up to enter set mode. Here, the current time can be entered individually for each digit in 24-hour format. By default, when first entering set mode the second's digit will be selected and start flashing. The four push buttons are used to navigate between the digits and increment/decrement them as follows:  
-- `KEY3` : move to the left
-- `KEY2` : increments the selected digit
-- `KEY1` : decrements the selected digit
-- `KEY0` : move to the right
-  
-To set the date, switch `SW1` is flipped up. Here, the year digit is initially selected by default. All four push buttons are used in the same way to set the date. Note that if both `SW0` and `SW1` are flipped up, priority is arbitrarily given to set the date.  
 
-In both cases, the code has been designed to make it impossible to enter invalid times and dates. Also note that when moving left/right, the selection will loop back around.  
+### Setup
+To set the time and date, follow these steps:
+
+1. **Enter Set Mode (Time)**:
+   - Flip switch `SW0` up to enter set mode for the clock.
+   - The current time is entered in **24-hour format**. The seconds digit will flash by default.
+   - Use push buttons `KEY2` to increment and `KEY1` to decrement the selected digit.
+   - Navigate between digits using `KEY3` (left) and `KEY0` (right).
+
+2. **Enter Set Mode (Date)**:
+   - Flip switch `SW1` up to set the date. The year digit is selected by default.
+   - Use the same push buttons as above to increment/decrement digits and navigate.
+   - **Note**: If both `SW0` and `SW1` are up, date setup takes priority.
+
+**Validation**: The system prevents invalid time and date entries. 
 
 ![Set Demo](./gifs/set.gif)
 
@@ -24,38 +33,37 @@ By default (i.e. when not in set mode, i.e. when all switches are down), the clo
 - `KEY2` : toggles the display of the seconds digit
     - when showing time in 24-hour format, this will blank `HEX1` and `HEX0`
     - when showing time in 12-hour format, this will show either `AM` or `PM` depending on the time
-- `KEY1` : displays the date for two seconds 
+- `KEY1` : displays the date in `MM/DD/YY` format for two seconds 
 - `KEY0` : toggles blanking all six hex displays
 
-![Mode Demo](./gifs/modes.gif)
+![Mode Demo](./gifs/modes.gif)  
+
+### Tools and Development Environment
+- **Assembler**: The code is compiled using the **Keil uVision IDE** with its `a51` assembler for 8051 microcontrollers.
+- **Board**: The project was tested on the **DE0-CV FPGA Board**, which interfaces with the 8051 architecture.
+- **Uploader**: A script (`b`) is provided to upload the compiled `.hex` file to the FPGA board.
 
 ## File Details 
 ```bash
 AssemblyClock
-├── MODDE0CV
-├── README.md
-├── a
-├── a51
-├── b
-├── backup
-│   └── clock_backup.asm
-├── clock.asm
-├── clock.hex
-├── clock.lst
-├── gifs
-│   ├── demo.gif
-│   ├── modes.gif
-│   └── set.gif
-├── pdex
-└── subroutines
-    ├── date.asm
-    ├── display.asm
-    ├── set_mode.asm
-    └── time.asm
+├── MODDE0CV           # Register definitions for the FPGA
+├── README.md          # This file
+├── clock.asm          # Main assembly code
+├── subroutines/       # Assembly subroutines for different functionalities
+│   ├── date.asm       # Date handling code
+│   ├── display.asm    # 7-segment display logic
+│   ├── set_mode.asm   # Clock and date setting modes
+│   └── time.asm       # Time handling code
+├── gifs/              # GIF demonstrations of clock functionality
+│   ├── demo.gif       # Shows clock in action
+│   ├── modes.gif      # Shows mode switching
+│   └── set.gif        # Shows time setting process
+├── a                  # Assembles code into .hex file
+├── a51                # Calls assembler for 8051 code
+├── b                  # Uploads .hex file to the FPGA
+├── backup/            # Backup of assembly code
+│   └── clock_backup.asm # Backup of clock.asm
+├── clock.hex          # Compiled machine code
+├── clock.lst          # Assembler output listing file
+└── pdex               # Tool for programming the FPGA
 ```
-- `a` is a script used to compile the assembly code into a .hex and .lst file by calling 'a51'.
-- `b` is a script used to upload the .hex to the board by calling 'pdex'.
-- `MODDE0CV` contains register definitions.
-- `clock.asm` contains the main code, which itself calls all the files in the subroutine directory.
-- `backup/clock_backup.asm` contains a backup of the code, all in a single file.
-- `gifs/` contains gifs used in the README
