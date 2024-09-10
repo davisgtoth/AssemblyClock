@@ -35,6 +35,10 @@ AssemblyClock
 ├── clock.asm
 ├── clock.hex
 ├── clock.lst
+├── gifs
+│   ├── demo.gif
+│   ├── modes.gif
+│   └── set.gif
 ├── pdex
 └── subroutines
     ├── date.asm
