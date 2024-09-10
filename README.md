@@ -13,7 +13,7 @@ To set the date, switch `SW1` is flipped up. Here, the year digit is initially s
 
 In both cases, the code has been designed to make it impossible to enter invalid times and dates. 
 
-### Modes
+### Display Modes
 By default (i.e. when not in set mode, i.e. when all switches are down), the clock will display the full time `hr:min:sec` in 24-hour format. All four push buttons can be used to toggle different display modes:
 - `KEY3` : toggles 12-hour format
 - `KEY2` : toggles the display of the seconds digit
@@ -47,6 +47,3 @@ AssemblyClock
 - 'MODDE0CV' contains register definitions.
 - 'clock.asm' contains the main code, which itself calls all the files in the subroutine directory.
 - 'backup/clock_backup.asm' contains a backup of the code, all in a single file.
-
-## To Be Implemented
-- Automatic time adjustment to prevent the clock from continuously falling behind

@@ -118,8 +118,8 @@ main_no_date:
     lcall display
     inc R0
     cjne R0, #100, main ; 100 * 10ms = 1 second
-    lcall incTime
     mov R0, #0
+    lcall incTime
     sjmp main
 
 ; Set mode - allows the user to set the time and date

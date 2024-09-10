@@ -30,7 +30,8 @@ wait10ms:
 
 ; Subroutine: incTime
 ; Description: increments the time by 1 second, adjusting minutes, hours, and date as needed
-; Modifies: a, time+0, time+1, time+2, date+0, date+1, date+2
+;              also adjusts the time to make up for lost seconds from executing commands, once every hour 
+; Modifies: a, R0, time+0, time+1, time+2, date+0, date+1, date+2
 incTime:
     mov a, time+0
     add a, #1
@@ -42,6 +43,9 @@ incTime:
     da a
     cjne a, #60H, incTime_ret2
     mov time+1, #0
+    ; adjust for lost time, loses ~1.4 seconds per hour
+    mov time+0, #1
+    mov R0, #40
     mov a, time+2
     add a, #1
     da a
